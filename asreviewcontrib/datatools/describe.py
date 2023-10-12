@@ -66,6 +66,8 @@ def describe(input_path, output_path=None):
         },
     }  # noqa
 
+    print("Laurens was here")
+
     if output_path:
         with open(output_path, "w") as f:
             json.dump(stats, f, indent=2)
