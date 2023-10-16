@@ -11,8 +11,11 @@ from asreviewcontrib.datatools.describe import _parse_arguments_describe
 from asreviewcontrib.datatools.describe import describe
 from asreviewcontrib.datatools.stack import _parse_arguments_vstack
 from asreviewcontrib.datatools.stack import vstack
+from asreviewcontrib.datatools.stack_source import _parse_arguments_vstack
+from asreviewcontrib.datatools.stack_source import vstack_source
 
-DATATOOLS = ["describe", "dedup", "convert", "compose", "vstack"]
+
+DATATOOLS = ["describe", "dedup", "convert", "compose", "vstack", "vstack-s"]
 
 
 class DataEntryPoint(BaseEntryPoint):
@@ -102,6 +105,11 @@ class DataEntryPoint(BaseEntryPoint):
                 args_vstack_parser = _parse_arguments_vstack()
                 args_vstack = args_vstack_parser.parse_args(argv[1:])
                 vstack(args_vstack.output_path, args_vstack.datasets)
+
+            if argv[0] == "vstack-s":
+                args_vstack_parser = _parse_arguments_vstack()
+                args_vstack = args_vstack_parser.parse_args(argv[1:])
+                vstack_source(args_vstack.output_path, args_vstack.datasets)
 
         # Print help message if subcommand not given or incorrect
         else:
