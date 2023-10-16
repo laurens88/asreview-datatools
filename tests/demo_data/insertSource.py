@@ -8,7 +8,7 @@ def insert(*files):
     
     file_dfs = [ASReviewData.from_file(file).df for file in files[1:]]
     
-    
+    print(file_dfs)
     target = file_dfs[1]
     # asd = ASReviewData.from_file(target)
 
