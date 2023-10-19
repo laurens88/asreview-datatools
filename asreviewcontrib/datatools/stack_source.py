@@ -117,28 +117,41 @@ def drop_duplicates(asrdata, pid='doi', inplace=False, reset_index=True):
     df = asrdata.df[~duplicated(asrdata, pid)]
     dupes = asrdata.df[duplicated(asrdata, pid)]
 
+    df_arobject = ASReviewData(df=df)
+    dupes_arobject = ASReviewData(df=dupes)
+
+    original_titles = df_arobject.title
+    original_doi = df_arobject.doi
+
+    dupe_titles = dupes_arobject.title
+    dupe_doi = dupes_arobject.doi
+
+    dupe_source_columns = []
+    for s_column in dupes.columns:
+        if ".csv" in s_column:
+            dupe_source_columns.append(s_column)
+
     for row in range(len(df.index)):
+
+        print(f'{row}/{len(df.index)}')
+
         for dupe in range(len(dupes.index)):
-            # if dupe==0:
-                    # df.iloc[row, df.columns.get_loc("name_of_database")] = "[" + str(df.iloc[row, df.columns.get_loc("name_of_database")])
 
             doi = df.iloc[row, df.columns.get_loc("doi")]
             title = df.iloc[row, df.columns.get_loc("title")]
-            # file_column_names = []
-            # for name in df.columns:
-            #     if ".csv" in name:
-            #         file_column_names.append(name)
-            # print(file_column_names)
-            # source = df.iloc[row, df.columns.get_loc()]
 
             #check if duplicate matches with doi if it is not empty, else do the same check with title
-            # if doi and doi == dupes.iloc[dupe, dupes.columns.get_loc("doi")]:
-            #     df.iloc[row, df.columns.get_loc("name_of_database")] = str(df.iloc[row, df.columns.get_loc("name_of_database")]) +","+ dupes.iloc[dupe, dupes.columns.get_loc("name_of_database")]
-                # df.iloc[row, df.columns.get_loc()]
-            # elif title and title == dupes.iloc[dupe, dupes.columns.get_loc("title")]:
-                # df.iloc[row, df.columns.get_loc("name_of_database")] = str(df.iloc[row, df.columns.get_loc("name_of_database")]) +","+ dupes.iloc[dupe, dupes.columns.get_loc("name_of_database")]
-            # if dupe==len(dupes.index)-1:
-            #     df.iloc[row, df.columns.get_loc("name_of_database")] = str(df.iloc[row, df.columns.get_loc("name_of_database")]) + "]"
+            if doi and doi == dupes.iloc[dupe, dupes.columns.get_loc("doi")]:
+                for c in dupe_source_columns:
+                    # if dupes.iloc[dupe, dupes.columns.get_loc(c)] == 1:
+                    #     df.iloc[row, df.columns.get_loc(c)] = 1
+                    df.iloc[row, df.columns.get_loc(c)] = dupes.iloc[dupe, dupes.columns.get_loc(c)]
+                
+            elif title and title == dupes.iloc[dupe, dupes.columns.get_loc("title")]:
+                for c in dupe_source_columns:
+                    # if dupes.iloc[dupe, dupes.columns.get_loc(c)] == 1:
+                        # df.iloc[row, df.columns.get_loc(c)] = 1
+                    df.iloc[row, df.columns.get_loc(c)] = dupes.iloc[dupe, dupes.columns.get_loc(c)]
 
     if reset_index:
         df = df.reset_index(drop=True)
