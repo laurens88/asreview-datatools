@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pandas as pd
 from pandas.api.types import is_string_dtype
-from asreview import ASReviewData
+from asreview import ASReviewData, config
 from asreview.data.base import load_data
 
 
@@ -28,6 +28,11 @@ def _check_suffix(input_files, output_file):
 def vstack_source(output_file, input_files):
     _check_suffix(input_files, output_file)
     list_dfs = [load_data(item).df for item in input_files]
+    mapping = {'title': config.COLUMN_DEFINITIONS['title']}
+    reverse_dict = {item: key for key, value_list in mapping.items() for item in value_list}
+    for df in list_dfs:
+        df.rename(columns=reverse_dict, inplace=True)
+
     for df_i in range(len(list_dfs)):
         df = list_dfs[df_i]
         # list_dfs[df_i] = df.assign(name_of_database=["'"+input_files[df_i]+"'"]*len(df.index))
@@ -118,6 +123,10 @@ def drop_duplicates(asrdata, pid='doi', inplace=False, reset_index=True):
     dupes = asrdata.df[duplicated(asrdata, pid)]
 
     df_arobject = ASReviewData(df=df)
+
+    if dupes.empty:
+        return df
+
     dupes_arobject = ASReviewData(df=dupes)
 
     original_titles = df_arobject.title
@@ -142,13 +151,17 @@ def drop_duplicates(asrdata, pid='doi', inplace=False, reset_index=True):
             dupe_title = dupes_titles[dupe]
 
             #check if duplicate matches with doi if it is not empty, else do the same check with title
-            if doi and doi == dupe_doi:
+            if len(doi) > 0 and doi == dupe_doi:
                 for c in dupe_source_columns:
-                    df.iloc[row, df.columns.get_loc(c)] = dupes.iloc[dupe, dupes.columns.get_loc(c)]
+                    if dupes.iloc[dupe, dupes.columns.get_loc(c)] == 1:
+                        df.iloc[row, df.columns.get_loc(c)] = 1
+                    # df.iloc[row, df.columns.get_loc(c)] = dupes.iloc[dupe, dupes.columns.get_loc(c)]
                 
-            elif title and title == dupe_title:
+            elif len(title) > 0 and title == dupe_title:
                 for c in dupe_source_columns:
-                    df.iloc[row, df.columns.get_loc(c)] = dupes.iloc[dupe, dupes.columns.get_loc(c)]
+                    if dupes.iloc[dupe, dupes.columns.get_loc(c)] == 1:
+                        df.iloc[row, df.columns.get_loc(c)] = 1
+                    # df.iloc[row, df.columns.get_loc(c)] = dupes.iloc[dupe, dupes.columns.get_loc(c)]
 
     if reset_index:
         df = df.reset_index(drop=True)

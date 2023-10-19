@@ -1,0 +1,5 @@
+record_id	type_of_reference	id	first_authors	primary_title	publication_year	volume	number	abstract	notes	alternate_title3	url	doi	note	keywords	issn	author_address	language	start_page	end_page	alternate_title2	date	access_date	place_published	publisher	included
+1		1		titeld1				lorem ipsem				D1													
+2		2		titeld2				lorem ipsem				D2													
+3		3		titel3				lorem ipsem																	
+4		4		titel4				lorem ipsem																	
