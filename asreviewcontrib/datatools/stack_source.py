@@ -123,8 +123,8 @@ def drop_duplicates(asrdata, pid='doi', inplace=False, reset_index=True):
     original_titles = df_arobject.title
     original_doi = df_arobject.doi
 
-    dupe_titles = dupes_arobject.title
-    dupe_doi = dupes_arobject.doi
+    dupes_titles = dupes_arobject.title
+    dupes_doi = dupes_arobject.doi
 
     dupe_source_columns = []
     for s_column in dupes.columns:
@@ -133,24 +133,21 @@ def drop_duplicates(asrdata, pid='doi', inplace=False, reset_index=True):
 
     for row in range(len(df.index)):
 
-        print(f'{row}/{len(df.index)}')
-
         for dupe in range(len(dupes.index)):
 
-            doi = df.iloc[row, df.columns.get_loc("doi")]
-            title = df.iloc[row, df.columns.get_loc("title")]
+            doi = original_doi[row]
+            title = original_titles[row]
+
+            dupe_doi = dupes_doi[dupe]
+            dupe_title = dupes_titles[dupe]
 
             #check if duplicate matches with doi if it is not empty, else do the same check with title
-            if doi and doi == dupes.iloc[dupe, dupes.columns.get_loc("doi")]:
+            if doi and doi == dupe_doi:
                 for c in dupe_source_columns:
-                    # if dupes.iloc[dupe, dupes.columns.get_loc(c)] == 1:
-                    #     df.iloc[row, df.columns.get_loc(c)] = 1
                     df.iloc[row, df.columns.get_loc(c)] = dupes.iloc[dupe, dupes.columns.get_loc(c)]
                 
-            elif title and title == dupes.iloc[dupe, dupes.columns.get_loc("title")]:
+            elif title and title == dupe_title:
                 for c in dupe_source_columns:
-                    # if dupes.iloc[dupe, dupes.columns.get_loc(c)] == 1:
-                        # df.iloc[row, df.columns.get_loc(c)] = 1
                     df.iloc[row, df.columns.get_loc(c)] = dupes.iloc[dupe, dupes.columns.get_loc(c)]
 
     if reset_index:
