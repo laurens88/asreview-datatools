@@ -151,13 +151,13 @@ def drop_duplicates(asrdata, pid='doi', inplace=False, reset_index=True):
             dupe_title = dupes_titles[dupe]
 
             #check if duplicate matches with doi if it is not empty, else do the same check with title
-            if len(doi) > 0 and doi == dupe_doi:
+            if len(str(doi)) > 0 and doi == dupe_doi:
                 for c in dupe_source_columns:
                     if dupes.iloc[dupe, dupes.columns.get_loc(c)] == 1:
                         df.iloc[row, df.columns.get_loc(c)] = 1
                     # df.iloc[row, df.columns.get_loc(c)] = dupes.iloc[dupe, dupes.columns.get_loc(c)]
                 
-            elif len(title) > 0 and title == dupe_title:
+            elif len(str(title)) > 0 and title == dupe_title:
                 for c in dupe_source_columns:
                     if dupes.iloc[dupe, dupes.columns.get_loc(c)] == 1:
                         df.iloc[row, df.columns.get_loc(c)] = 1
