@@ -28,20 +28,17 @@ def _check_suffix(input_files, output_file):
 def vstack_source(output_file, input_files):
     _check_suffix(input_files, output_file)
     list_dfs = [load_data(item).df for item in input_files]
-    mapping = {'title': config.COLUMN_DEFINITIONS['title']}
-    reverse_dict = {item: key for key, value_list in mapping.items() for item in value_list}
-    for df in list_dfs:
-        df.rename(columns=reverse_dict, inplace=True)
+    title_mapping = {'title': config.COLUMN_DEFINITIONS['title']}
+    reverse_dict = {item: key for key, value_list in title_mapping.items() for item in value_list}
+    for df_i in range(len(list_dfs)):
+        list_dfs[df_i].rename(columns=reverse_dict, inplace=True)
+        for included_column in config.COLUMN_DEFINITIONS['included']:
+            if included_column in list_dfs[df_i].columns:
+                list_dfs[df_i].rename(columns={included_column: 'included_'+input_files[df_i]}, inplace=True)
 
     for df_i in range(len(list_dfs)):
         df = list_dfs[df_i]
-        # list_dfs[df_i] = df.assign(name_of_database=["'"+input_files[df_i]+"'"]*len(df.index))
         list_dfs[df_i][input_files[df_i]] = 1 
-        # print(input_files[df_i])
-        # list_dfs[df_i][input_files[df_i]] = 1 
-        #change the line above such that each df gets a column for every unique input_files element which is filled with all zeros
-        #then in the drop duplicates for loop, overwrite cells to 1 instead of adding string to name_of_database
-        #use a for loop somewhere that loops through the input_files again which are now treated as df columns to overwrite cells
 
 
     df_vstacked = pd.concat(list_dfs).reset_index(drop=True)
