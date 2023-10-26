@@ -40,7 +40,6 @@ def vstack_source(output_file, input_files):
         df = list_dfs[df_i]
         list_dfs[df_i][input_files[df_i]] = 1 
 
-
     df_vstacked = pd.concat(list_dfs).reset_index(drop=True)
     df_vstacked_s = fill_source_columns(df_vstacked, input_files)
     as_vstacked = ASReviewData(df=df_vstacked_s)
@@ -152,14 +151,15 @@ def drop_duplicates(asrdata, pid='doi', inplace=False, reset_index=True):
                 for c in dupe_source_columns:
                     if dupes.iloc[dupe, dupes.columns.get_loc(c)] == 1:
                         df.iloc[row, df.columns.get_loc(c)] = 1
-                    # df.iloc[row, df.columns.get_loc(c)] = dupes.iloc[dupe, dupes.columns.get_loc(c)]
                 
             elif len(str(title)) > 0 and title == dupe_title:
                 for c in dupe_source_columns:
                     if dupes.iloc[dupe, dupes.columns.get_loc(c)] == 1:
                         df.iloc[row, df.columns.get_loc(c)] = 1
-                    # df.iloc[row, df.columns.get_loc(c)] = dupes.iloc[dupe, dupes.columns.get_loc(c)]
 
+    # Re-order columns such that: first source columns and second label columns
+    
+    
     if reset_index:
         df = df.reset_index(drop=True)
     if inplace:
