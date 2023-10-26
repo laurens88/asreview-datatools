@@ -158,6 +158,15 @@ def drop_duplicates(asrdata, pid='doi', inplace=False, reset_index=True):
                         df.iloc[row, df.columns.get_loc(c)] = 1
 
     # Re-order columns such that: first source columns and second label columns
+    for column in df.columns:
+        if ".csv" in column:
+            c = df.pop(column)
+            df.insert(len(df.columns), column, c)
+
+    for column in df.columns:
+        if "included_" in column:
+            c = df.pop(column)
+            df.insert(len(df.columns), column, c)
     
     
     if reset_index:
