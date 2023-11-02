@@ -34,6 +34,7 @@ def vstack_source(output_file, input_files):
         list_dfs[df_i].rename(columns=reverse_dict, inplace=True)
         for included_column in config.COLUMN_DEFINITIONS['included']:
             if included_column in list_dfs[df_i].columns:
+                list_dfs[df_i][included_column] = list_dfs[df_i][included_column].replace(-1, None)
                 list_dfs[df_i].rename(columns={included_column: 'included_'+input_files[df_i]}, inplace=True)
 
     for df_i in range(len(list_dfs)):
@@ -116,6 +117,7 @@ def drop_duplicates(asrdata, pid='doi', inplace=False, reset_index=True):
         DataFrame with duplicates removed or None if inplace=True
     """
     df = asrdata.df[~duplicated(asrdata, pid)]
+
     dupes = asrdata.df[duplicated(asrdata, pid)]
 
     df_arobject = ASReviewData(df=df)
