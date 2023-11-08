@@ -45,8 +45,14 @@ def vstack_source(output_file, input_files):
     df_vstacked_s = fill_source_columns(df_vstacked, input_files)
     as_vstacked = ASReviewData(df=df_vstacked_s)
     as_vstacked = ASReviewData(df=drop_duplicates(as_vstacked))
+    as_vstacked_short = ASReviewData(df=shorten(as_vstacked.df))
 
     as_vstacked.to_file(output_file)
+    as_vstacked_short.to_file(output_file[:-4]+"_short.csv")
+
+def shorten(dataframe):
+    important_columns = config.COLUMN_DEFINITIONS['title'] + config.COLUMN_DEFINITIONS['abstract'] + config.COLUMN_DEFINITIONS['doi']
+    return dataframe[dataframe.columns.intersection(important_columns)]
 
 def fill_source_columns(dataframe, column_names):
     for name in column_names:
