@@ -25,7 +25,7 @@ def _check_suffix(input_files, output_file):
             )
 
 
-def merge(output_file, input_files):
+def vstack_source(output_file, input_files):
     _check_suffix(input_files, output_file)
     list_dfs = [load_data(item).df for item in input_files]
     title_mapping = {'title': config.COLUMN_DEFINITIONS['title']}
@@ -45,17 +45,10 @@ def merge(output_file, input_files):
 
     df_vstacked = pd.concat(list_dfs).reset_index(drop=True)
     df_vstacked_s = fill_source_columns(df_vstacked, input_files)
+    as_vstacked = ASReviewData(df=df_vstacked_s)
+    as_vstacked = ASReviewData(df=add_mother_id(drop_duplicates(as_vstacked)))
 
-    df = drop_duplicates(ASReviewData(df_vstacked_s))
-    print(df['MID'])
-    df = add_mother_id(df)
-    print(df['MID'])
-    df = clean_columns(df)
-    as_merged = ASReviewData(df=df)
-    # as_vstacked = ASReviewData(df=df_vstacked_s)
-    # as_vstacked = ASReviewData(df=add_mother_id(drop_duplicates(as_vstacked)))
-
-    as_merged.to_file(output_file)
+    as_vstacked.to_file(output_file)
 
 def fill_source_columns(dataframe, column_names):
     for name in column_names:
@@ -67,20 +60,14 @@ def fill_source_columns(dataframe, column_names):
 def add_mother_id(dataframe):
     if 'MID' in dataframe.columns:
         #get last MID
-        last_MID_index = dataframe['MID'].dropna().last_valid_index()
-        # last_MID = dataframe['MID'].loc[last_MID_index]
-        num_MIDs = dataframe['MID'].count()
-        for i in range(last_MID_index+1, len(dataframe)):
-            dataframe.loc[i, 'MID'] = 'M'+str(num_MIDs)
-            num_MIDs += 1
+        last_MID_index = df['MID'].dropna().last_valid_index()
+        last_MID = df['MID'].loc[last_MID_index]
+        for i in range(last_MID_index, len(dataframe)):
+            dataframe.loc[i, 'MID'] = 'M'+str(i)
 
     else:
         dataframe.insert(0, 'MID', ['M'+str(i) for i in range(len(dataframe))])
     return dataframe
-
-def clean_columns(dataframe):
-    columns_to_drop = [c for c in dataframe.columns if len(c)==0 or "Unnamed" in c]
-    return dataframe.drop(columns_to_drop, axis=1)
 
 def duplicated(asrdata, pid='doi'):
         """Return boolean Series denoting duplicate rows.

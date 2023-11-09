@@ -1,6 +1,7 @@
-record_id	type_of_reference	id	first_authors	primary_title	publication_year	volume	number	abstract	notes	alternate_title3	url	doi	note	keywords	issn	author_address	language	start_page	end_page	alternate_title2	date	access_date	place_published	publisher	included
-1		1		titeld1				lorem ipsem				D1													
-2		2		titeld2				lorem ipsem				D2													
-3		3		titel3				lorem ipsem																	
-4		4		titel4				lorem ipsem																	
-				titel5																					
+,type_of_reference,authors,date,publisher,year,short_title,title,id,abstract,author_address,name_of_database,type_of_work,notes,start_page,secondary_title,url,doi,place_published,volume,keywords,secondary_authors,accession_number,language,number_of_Volumes,edition,alternate_title1,note,issn,number,custom7,database_provider,version,file_attachments1,custom2,custom6,original_publication,access_date
+0,,,,,2001,,title13,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+1,,,,,2002,,title14,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+2,,,,,2003,,title15,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+3,,,,,2003,,title16,,,,,,,,,,10,,,,,,,,,,,,,,,,,,,,
+,,,,,2002,,title17,,,,,,,,,,11,,,,,,,,,,,,,,,,,,,,
+,,,,,2002,,title18,,,,,,,,,,12,,,,,,,,,,,,,,,,,,,,
