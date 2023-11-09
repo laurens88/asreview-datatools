@@ -46,7 +46,7 @@ def vstack_source(output_file, input_files):
     df_vstacked = pd.concat(list_dfs).reset_index(drop=True)
     df_vstacked_s = fill_source_columns(df_vstacked, input_files)
     as_vstacked = ASReviewData(df=df_vstacked_s)
-    as_vstacked = ASReviewData(df=drop_duplicates(as_vstacked))
+    as_vstacked = ASReviewData(df=add_mother_id(drop_duplicates(as_vstacked)))
 
     as_vstacked.to_file(output_file)
 
@@ -55,6 +55,18 @@ def fill_source_columns(dataframe, column_names):
         for row in range(dataframe.shape[0]):
             if dataframe.iloc[row, dataframe.columns.get_loc(name)] != 1:
                 dataframe.iloc[row, dataframe.columns.get_loc(name)] = 0
+    return dataframe
+
+def add_mother_id(dataframe):
+    if 'MID' in dataframe.columns:
+        #get last MID
+        last_MID_index = df['MID'].dropna().last_valid_index()
+        last_MID = df['MID'].loc[last_MID_index]
+        for i in range(last_MID_index, len(dataframe)):
+            dataframe.loc[i, 'MID'] = 'M'+str(i)
+
+    else:
+        dataframe.insert(0, 'MID', ['M'+str(i) for i in range(len(dataframe))])
     return dataframe
 
 def duplicated(asrdata, pid='doi'):
