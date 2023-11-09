@@ -28,6 +28,9 @@ def _check_suffix(input_files, output_file):
 def merge(output_file, input_files):
     _check_suffix(input_files, output_file)
     list_dfs = [load_data(item).df for item in input_files]
+
+    file_dict = dict(zip(input_files, list_dfs))
+
     title_mapping = {'title': config.COLUMN_DEFINITIONS['title']}
     reverse_dict = {item: key for key, value_list in title_mapping.items() for item in value_list}
     for df_i in range(len(list_dfs)):
@@ -41,20 +44,40 @@ def merge(output_file, input_files):
 
     #fill source column of individual file dataframes
     for df_i in range(len(list_dfs)):
-        list_dfs[df_i][input_files[df_i]] = 1 
+        if input_files[df_i] != output_file:
+            list_dfs[df_i][input_files[df_i]] = 1 
 
     df_vstacked = pd.concat(list_dfs).reset_index(drop=True)
-    df_vstacked_s = fill_source_columns(df_vstacked, input_files)
+
+    source_columns = input_files + [c for c in df_vstacked if ".csv" in c]
+    if output_file in source_columns:
+        source_columns.remove(output_file)
+
+    df_vstacked_s = fill_source_columns(df_vstacked, source_columns)
 
     df = drop_duplicates(ASReviewData(df_vstacked_s))
     df = assign_mother_id(df)
     df = clean_columns(df)
 
-    as_merged = ASReviewData(df=df[df['abstract'].notna()])
-    as_missing_abstracts = ASReviewData(df=df[df['abstract'].isna()])
-
+    merged_complete_records = df[df['abstract'] != ""]
+    as_merged = ASReviewData(df=merged_complete_records)
     as_merged.to_file(output_file)
-    as_missing_abstracts.to_file(output_file[:-4]+"missing_abstracts.csv")
+
+    df_missing_abstracts = df[df['abstract'] == ""]
+
+    if not df_missing_abstracts.empty:
+        as_missing_abstracts = ASReviewData(df=df_missing_abstracts)
+        as_missing_abstracts.to_file(output_file[:-4]+"missing_AB.csv")
+
+    #Display statistics about datasets merged
+    print()
+    print("Statistics about input sets:")
+    for k,v in file_dict.items():
+        print(f'{len(v.index)} \t elements in {k}')
+    print()
+    print("Statistics after merging:")
+    count_unique_records(merged_complete_records)
+    
 
 def fill_source_columns(dataframe, column_names):
     for name in column_names:
@@ -69,7 +92,8 @@ def assign_mother_id(df):
         last_id = df['MID'].dropna().apply(lambda x: int(x[1:])).max()
     else:
         # If 'MID' column doesn't exist, create it and start from 0
-        df['MID'] = None
+        df.insert(0, 'MID', pd.Series(), True)
+
         last_id = -1
 
     # Assign unique IDs to rows where 'MID' is NaN
@@ -81,6 +105,9 @@ def assign_mother_id(df):
 def clean_columns(dataframe):
     columns_to_drop = [c for c in dataframe.columns if len(c)==0 or "Unnamed" in c]
     return dataframe.drop(columns_to_drop, axis=1)
+
+def count_unique_records(dataframe):
+    pass
 
 def duplicated(asrdata, pid='doi'):
         """Return boolean Series denoting duplicate rows.
