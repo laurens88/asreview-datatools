@@ -47,15 +47,14 @@ def merge(output_file, input_files):
     df_vstacked_s = fill_source_columns(df_vstacked, input_files)
 
     df = drop_duplicates(ASReviewData(df_vstacked_s))
-    print(df['MID'])
-    df = add_mother_id(df)
-    print(df['MID'])
+    df = assign_mother_id(df)
     df = clean_columns(df)
-    as_merged = ASReviewData(df=df)
-    # as_vstacked = ASReviewData(df=df_vstacked_s)
-    # as_vstacked = ASReviewData(df=add_mother_id(drop_duplicates(as_vstacked)))
+
+    as_merged = ASReviewData(df=df[df['abstract'].notna()])
+    as_missing_abstracts = ASReviewData(df=df[df['abstract'].isna()])
 
     as_merged.to_file(output_file)
+    as_missing_abstracts.to_file(output_file[:-4]+"missing_abstracts.csv")
 
 def fill_source_columns(dataframe, column_names):
     for name in column_names:
@@ -64,19 +63,20 @@ def fill_source_columns(dataframe, column_names):
                 dataframe.iloc[row, dataframe.columns.get_loc(name)] = 0
     return dataframe
 
-def add_mother_id(dataframe):
-    if 'MID' in dataframe.columns:
-        #get last MID
-        last_MID_index = dataframe['MID'].dropna().last_valid_index()
-        # last_MID = dataframe['MID'].loc[last_MID_index]
-        num_MIDs = dataframe['MID'].count()
-        for i in range(last_MID_index+1, len(dataframe)):
-            dataframe.loc[i, 'MID'] = 'M'+str(num_MIDs)
-            num_MIDs += 1
-
+def assign_mother_id(df):
+    if 'MID' in df.columns:
+        # If 'MID' column exists, find the last assigned ID
+        last_id = df['MID'].dropna().apply(lambda x: int(x[1:])).max()
     else:
-        dataframe.insert(0, 'MID', ['M'+str(i) for i in range(len(dataframe))])
-    return dataframe
+        # If 'MID' column doesn't exist, create it and start from 0
+        df['MID'] = None
+        last_id = -1
+
+    # Assign unique IDs to rows where 'MID' is NaN
+    mask = df['MID'].isna()
+    df.loc[mask, 'MID'] = ['M'+str(i) for i in range(last_id+1, last_id+1+mask.sum())]
+
+    return df
 
 def clean_columns(dataframe):
     columns_to_drop = [c for c in dataframe.columns if len(c)==0 or "Unnamed" in c]

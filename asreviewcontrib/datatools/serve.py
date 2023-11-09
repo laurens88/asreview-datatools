@@ -30,8 +30,12 @@ def serve(file, *annotators):
     
     print(annotation_df)
 
-    #drop all columns except title, abstract, doi, and MID
-    important_columns = config.COLUMN_DEFINITIONS['title'] + config.COLUMN_DEFINITIONS['abstract'] + config.COLUMN_DEFINITIONS['doi'] + ['MID', 'publication_year']
+    #drop all columns except title, abstract, doi, MID, and any columns containing year
+    important_columns = config.COLUMN_DEFINITIONS['title'] 
+    + config.COLUMN_DEFINITIONS['abstract'] 
+    + config.COLUMN_DEFINITIONS['doi'] 
+    + ['MID', 'publication_year']
+    + [c for c in annotation_df.columns if "year" in c]
     annotation_df =  annotation_df[annotation_df.columns.intersection(important_columns)]
 
     print(annotation_df)
