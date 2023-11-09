@@ -31,7 +31,7 @@ def serve(file, *annotators):
     print(annotation_df)
 
     #drop all columns except title, abstract, doi, and MID
-    important_columns = config.COLUMN_DEFINITIONS['title'] + config.COLUMN_DEFINITIONS['abstract'] + config.COLUMN_DEFINITIONS['doi'] + ['MID']
+    important_columns = config.COLUMN_DEFINITIONS['title'] + config.COLUMN_DEFINITIONS['abstract'] + config.COLUMN_DEFINITIONS['doi'] + ['MID', 'publication_year']
     annotation_df =  annotation_df[annotation_df.columns.intersection(important_columns)]
 
     print(annotation_df)
