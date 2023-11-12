@@ -10,9 +10,10 @@ from asreview.data.base import load_data
 
 
 def serve(file, *annotators):
-    print(file)
-
-    print(annotators)
+    print("test")
+    print(f'File: {file}')
+    print("hello")
+    print(f'Annotators: {annotators}')
 
     dataframe = pd.read_csv(file)
 
