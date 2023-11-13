@@ -12,7 +12,7 @@ from asreview import ASReviewData, config
 from asreview.data.base import load_data
 
 
-def serve(file, annotators):
+def serve(file, n_records, annotators):
     if not annotators:
         print("No annotators were given.")
         return
@@ -79,10 +79,14 @@ def output_annotation_df(annotation_df, annotators):
         #output new annotation dataframe
         df.to_csv(annotator+".csv")
 
+def sort_by_date(df):
+    return df.sort_values('year', ascending=True)
+
 def main():
     file = sys.argv[1]
-    annotators = sys.argv[2:]
-    serve(file, annotators)
+    n_records = sys.argv[2]
+    annotators = sys.argv[3:]
+    serve(file, n_records, annotators)
 
 if __name__ == "__main__":
     main()
