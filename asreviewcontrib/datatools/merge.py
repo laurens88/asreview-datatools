@@ -38,11 +38,17 @@ def merge(output_file, input_files):
     for df_i in range(len(list_dfs)):
         list_dfs[df_i].rename(columns=reverse_dict, inplace=True)
 
-        #rename included column to include file name
+        
         for included_column in config.COLUMN_DEFINITIONS['included']:
             if included_column in list_dfs[df_i].columns:
+                #Remove -1 labels
                 list_dfs[df_i][included_column] = list_dfs[df_i][included_column].replace(-1, None)
+                #rename included column to include file name
                 list_dfs[df_i].rename(columns={included_column: 'included_'+input_files[df_i]}, inplace=True)
+        #Generalize year columns to 'year'
+        for col in list_dfs[df_i].columns:
+            if 'year' in col:
+                list_dfs[df_i].rename(columns={col: 'year'}, inplace=True)
 
     #fill source column of individual file dataframes
     for df_i in range(len(list_dfs)):

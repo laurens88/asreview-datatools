@@ -43,15 +43,18 @@ def serve(file, n_records, annotators):
     + [col for col in annotation_df.columns if 'year' in col]
     annotation_df =  annotation_df[annotation_df.columns.intersection(important_columns)]
 
-    output_annotation_df(annotation_df, annotators)
+    print(annotation_df)
+
+    sorted_df = sort_by_date(annotation_df)
+
+    print(sorted_df)
+
+    df = random_old_new(sorted_df, n_records)
+
+    output_annotation_df(df, annotators)
 
     
-
 def row_has_label(row, label_columns):
-    # for col in label_columns:
-    #     if row[col] in [0, 1]:
-    #         return True
-    # return False
     return any(row[col] in [0, 1] for col in label_columns)
 
 def output_annotation_df(annotation_df, annotators):
@@ -81,6 +84,24 @@ def output_annotation_df(annotation_df, annotators):
 
 def sort_by_date(df):
     return df.sort_values('year', ascending=True)
+
+def random_old_new(df, n_records):
+    # df = df['year'].dropna(inplace=True)
+    df = df[df['year'].notnull()]
+    print(df)
+    n_records = int(n_records)
+    try:
+        if len(df) < n_records*2:
+            raise ValueError("There are not enough (dated) records.")
+        else:
+            random_old = df[0:n_records]
+            random_new = df[-n_records:len(df)]
+            print(len(random_new))
+            return pd.concat([random_old, random_new]).reset_index(drop=True)
+    except ValueError as e:
+        print(e)
+        sys.exit(1)
+    
 
 def main():
     file = sys.argv[1]
