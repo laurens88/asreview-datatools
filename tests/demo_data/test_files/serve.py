@@ -45,7 +45,6 @@ def serve(file, annotators):
 
     output_annotation_df(annotation_df, annotators)
 
-    
 
 def row_has_label(row, label_columns):
     # for col in label_columns:
