@@ -61,6 +61,7 @@ def output_annotation_df(annotation_df, annotators):
         df = annotation_df.copy()
 
         #add title abstract annotation columns
+        df[f'title_eligible_{annotator}'] = np.nan
         df[f'TI-AB_IC1_{annotator}'] = np.nan
         df[f'TI-AB_IC2_{annotator}'] = np.nan
         df[f'TI-AB_IC3_{annotator}'] = np.nan
