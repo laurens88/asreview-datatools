@@ -75,7 +75,7 @@ def merge(output_file, input_files):
 
     if not df_missing_abstracts.empty:
         as_missing_abstracts = ASReviewData(df=df_missing_abstracts)
-        as_missing_abstracts.to_file(output_file[:-4]+"missing_AB.csv")
+        as_missing_abstracts.to_file(output_file[:-4]+"_missing_AB.csv")
 
     #Display statistics about datasets merged
     print()
