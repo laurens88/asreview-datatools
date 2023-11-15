@@ -89,9 +89,10 @@ def merge(output_file, input_files):
 
 def fill_source_columns(dataframe, column_names):
     for name in column_names:
-        for row in range(dataframe.shape[0]):
-            if dataframe.iloc[row, dataframe.columns.get_loc(name)] != 1:
-                dataframe.iloc[row, dataframe.columns.get_loc(name)] = 0
+        if not 'included_' in name:
+            for row in range(dataframe.shape[0]):
+                if dataframe.iloc[row, dataframe.columns.get_loc(name)] != 1:
+                    dataframe.iloc[row, dataframe.columns.get_loc(name)] = 0
     return dataframe
 
 def assign_mother_id(df):
