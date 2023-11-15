@@ -69,12 +69,12 @@ def output_annotation_df(annotation_df, annotators):
         df[f'TI-AB_final_label_{annotator}'] = np.nan
 
         #add full text annotation columns
-        df[f'FT_IC1_{annotator}'] = np.nan
-        df[f'FT_IC2_{annotator}'] = np.nan
-        df[f'FT_IC3_{annotator}'] = np.nan
-        df[f'FT_IC4_{annotator}'] = np.nan
-        df[f'FT_other_exlusion_reason_{annotator}'] = np.nan
-        df[f'FT_final_label_{annotator}'] = np.nan
+        # df[f'FT_IC1_{annotator}'] = np.nan
+        # df[f'FT_IC2_{annotator}'] = np.nan
+        # df[f'FT_IC3_{annotator}'] = np.nan
+        # df[f'FT_IC4_{annotator}'] = np.nan
+        # df[f'FT_other_exlusion_reason_{annotator}'] = np.nan
+        # df[f'FT_final_label_{annotator}'] = np.nan
 
         #output new annotation dataframe
         df.to_excel(annotator+".xlsx", index=False)
