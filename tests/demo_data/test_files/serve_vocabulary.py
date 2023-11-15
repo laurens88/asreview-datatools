@@ -83,7 +83,6 @@ def sort_by_date(df):
     return df.sort_values('year', ascending=True)
 
 def old_random_new(df, n_records):
-    # df = df['year'].dropna(inplace=True)
     df = df[df['year'].notnull()]
 
     n_records = int(n_records)

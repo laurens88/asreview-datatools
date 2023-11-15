@@ -47,10 +47,6 @@ def serve(file, annotators):
 
 
 def row_has_label(row, label_columns):
-    # for col in label_columns:
-    #     if row[col] in [0, 1]:
-    #         return True
-    # return False
     return any(row[col] in [0, 1] for col in label_columns)
 
 def output_annotation_df(annotation_df, annotators):

@@ -67,12 +67,14 @@ def merge(output_file, input_files):
     df = assign_mother_id(df)
     df = clean_columns(df)
 
+    #Output file
     merged_complete_records = df[df['abstract'] != ""]
     as_merged = ASReviewData(df=merged_complete_records)
     as_merged.to_file(output_file)
 
     df_missing_abstracts = df[df['abstract'] == ""]
 
+    #Output missing abstracts file
     if not df_missing_abstracts.empty:
         as_missing_abstracts = ASReviewData(df=df_missing_abstracts)
         as_missing_abstracts.to_file(output_file[:-4]+"_missing_AB.csv")
