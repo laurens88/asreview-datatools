@@ -77,7 +77,7 @@ def output_annotation_df(annotation_df, annotators):
         df[f'FT_final_label_{annotator}'] = np.nan
 
         #output new annotation dataframe
-        df.to_csv(annotator+".csv")
+        df.to_excel(annotator+".xlsx", index=False)
 
 def main():
     file = sys.argv[1]
