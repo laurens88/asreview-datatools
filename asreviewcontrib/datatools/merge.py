@@ -9,6 +9,9 @@ from pandas.api.types import is_string_dtype
 from asreview import ASReviewData, config
 from asreview.data.base import load_data
 
+import seaborn as sns
+import matplotlib.pyplot as plt
+
 pd.options.mode.chained_assignment = None
 
 def _check_suffix(input_files, output_file):
@@ -92,6 +95,7 @@ def merge(output_file, input_files):
     unique_records_dict = count_unique_records(merged_complete_records)
     for k, v in unique_records_dict.items():
         print(f'{int(v)}\t unique records in {k}')
+    heatmap(merged_complete_records)
     
 
 def fill_source_columns(dataframe, column_names):
@@ -136,12 +140,29 @@ def count_unique_records(dataframe):
 
     return result
 
-    # record_dict = {key: 0 for key in source_cols}
-    # for row in dataframe[source_cols]:
-    #     for col in source_cols:
-    #         if dataframe.iloc[row, col] == 1:
-    #             record_dict[col] += 1
-    
+def heatmap(dataframe):
+    source_cols = [col for col in dataframe.columns if 'Data_' in col and 'included' not in col]
+    df = dataframe[source_cols]
+    df['row_as_str'] = df.apply(lambda row: ''.join(row.values.astype(int).astype(str)), axis=1)
+
+    # Count the frequency of each unique row
+    df_freq = df['row_as_str'].value_counts().reset_index()
+    df_freq.columns = ['row_as_str', 'frequency']
+
+    print(df_freq)
+
+    # Convert the string rows back to a DataFrame
+    df_freq = df_freq.join(df_freq['row_as_str'].apply(lambda x: pd.Series(list(x))))
+    df_freq = df_freq.drop(columns=['row_as_str'])
+
+    print(df_freq)
+
+    # Convert the DataFrame to a matrix
+    matrix = df_freq.values
+
+    # Create a heatmap
+    sns.heatmap(matrix, cmap='viridis')
+    plt.show()    
 
 def duplicated(asrdata, pid='doi'):
         """Return boolean Series denoting duplicate rows.
