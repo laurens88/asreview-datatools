@@ -9,6 +9,7 @@ from pandas.api.types import is_string_dtype
 from asreview import ASReviewData, config
 from asreview.data.base import load_data
 
+pd.options.mode.chained_assignment = None
 
 def _check_suffix(input_files, output_file):
     # Also raises ValueError on URLs that do not end with a file extension
@@ -70,14 +71,16 @@ def merge(output_file, input_files):
     #Output file
     merged_complete_records = df[df['abstract'] != ""]
     as_merged = ASReviewData(df=merged_complete_records)
-    as_merged.to_file(output_file)
+    as_merged.df.to_csv(output_file, index=False)
+    # as_merged.to_file(output_file)
 
     df_missing_abstracts = df[df['abstract'] == ""]
 
     #Output missing abstracts file
     if not df_missing_abstracts.empty:
         as_missing_abstracts = ASReviewData(df=df_missing_abstracts)
-        as_missing_abstracts.to_file(output_file[:-4]+"_missing_AB.csv")
+        # as_missing_abstracts.to_file(output_file[:-4]+"_missing_AB.csv")
+        as_missing_abstracts.df.to_csv(output_file[:-4]+"_missing_AB.csv", index=False)
 
     #Display statistics about datasets merged
     print()
@@ -86,7 +89,9 @@ def merge(output_file, input_files):
         print(f'{len(v.index)} \t elements in {k}')
     print()
     print("Statistics after merging:")
-    count_unique_records(merged_complete_records)
+    unique_records_dict = count_unique_records(merged_complete_records)
+    for k, v in unique_records_dict.items():
+        print(f'{int(v)}\t unique records in {k}')
     
 
 def fill_source_columns(dataframe, column_names):
@@ -118,7 +123,25 @@ def clean_columns(dataframe):
     return dataframe.drop(columns_to_drop, axis=1)
 
 def count_unique_records(dataframe):
-    pass
+    source_cols = [col for col in dataframe.columns if 'Data_' in col and 'included' not in col]
+    df = dataframe[source_cols]
+
+    df['row_sum'] = df.sum(axis=1)
+
+    df_single = df[df['row_sum'] == 1]
+
+    df_single = df_single.drop(columns=['row_sum'])
+
+    result = df_single.sum().to_dict()
+
+    return result
+
+    # record_dict = {key: 0 for key in source_cols}
+    # for row in dataframe[source_cols]:
+    #     for col in source_cols:
+    #         if dataframe.iloc[row, col] == 1:
+    #             record_dict[col] += 1
+    
 
 def duplicated(asrdata, pid='doi'):
         """Return boolean Series denoting duplicate rows.
