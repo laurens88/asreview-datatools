@@ -69,7 +69,7 @@ def merge(output_file, input_files):
     df = clean_columns(df)
 
     #Output file
-    merged_complete_records = df[df['abstract'] != ""]
+    merged_complete_records = df
     as_merged = ASReviewData(df=merged_complete_records)
     as_merged.df.to_csv(output_file, index=False)
     # as_merged.to_file(output_file)
