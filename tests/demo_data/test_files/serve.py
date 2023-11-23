@@ -12,7 +12,7 @@ from asreview import ASReviewData, config
 from asreview.data.base import load_data
 
 
-def serve(file, annotators):
+def serve(file, n_records, annotators):
     if not annotators:
         print("No annotators were given.")
         return
@@ -43,17 +43,18 @@ def serve(file, annotators):
     + [col for col in annotation_df.columns if 'year' in col]
     annotation_df =  annotation_df[annotation_df.columns.intersection(important_columns)]
 
-    output_annotation_df(annotation_df, annotators)
+    output_annotation_df(annotation_df, n_records, annotators)
 
 
 def row_has_label(row, label_columns):
     return any(row[col] in [0, 1] for col in label_columns)
 
-def output_annotation_df(annotation_df, annotators):
+def output_annotation_df(annotation_df, n_records, annotators):
     #add annotator columns to annotation dataframe
     for annotator in annotators:
         #create copy of dataframe for each annotator
         df = annotation_df.copy()
+        df = df.sample(n=n_records, random_state=1)
 
         #add title abstract annotation columns
         df[f'title_eligible_{annotator}'] = np.nan
@@ -77,7 +78,8 @@ def output_annotation_df(annotation_df, annotators):
 
 def main():
     file = sys.argv[1]
-    annotators = sys.argv[2:]
+    n_records = sys.argv[2]
+    annotators = sys.argv[3:]
     serve(file, annotators)
 
 if __name__ == "__main__":

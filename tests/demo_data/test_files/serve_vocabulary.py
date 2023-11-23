@@ -12,7 +12,7 @@ from asreview import ASReviewData, config
 from asreview.data.base import load_data
 
 
-def serve(file, n_records, annotators):
+def serve(file, prior_calibration_file, n_records, annotators):
     if not annotators:
         print("No annotators were given.")
         return
@@ -31,7 +31,6 @@ def serve(file, n_records, annotators):
                 unlabeled_row = dataframe.iloc[row]
                 annotation_df.loc[len(annotation_df)] = unlabeled_row
     
-        print(annotation_df)
         print(f'Found {len(annotation_df)} records without label.')
     
     else:
@@ -45,7 +44,11 @@ def serve(file, n_records, annotators):
 
     sorted_df = sort_by_date(annotation_df)
 
-    df = old_random_new(sorted_df, n_records)
+    #remove records that were in previous calibration phases
+    prior_calibration_df = pd.read_excel(prior_calibration_file)
+    prior_mid = prior_calibration_df['MID']
+
+    df = old_random_new(sorted_df, n_records, prior_mid)
 
     output_annotation_df(df, annotators)
 
@@ -82,7 +85,7 @@ def output_annotation_df(annotation_df, annotators):
 def sort_by_date(df):
     return df.sort_values('year', ascending=True)
 
-def old_random_new(df, n_records):
+def old_random_new(df, n_records, prior_mid=[]):
     df = df[df['year'].notnull()]
 
     n_records = int(n_records)
@@ -91,8 +94,11 @@ def old_random_new(df, n_records):
             raise ValueError("There are not enough (dated) records.")
         else:
             old = df[0:n_records]
-            random = df.sample(n_records)
             new = df[-n_records:len(df)]
+            #remove all records with MID in prior_mid from df
+            df = df[~df['MID'].isin(prior_mid)]
+
+            random = df.sample(n=n_records, random_state=1)
             print(old)
             print(random)
             print(new)
@@ -104,9 +110,10 @@ def old_random_new(df, n_records):
 
 def main():
     file = sys.argv[1]
-    n_records = sys.argv[2]
-    annotators = sys.argv[3:]
-    serve(file, n_records, annotators)
+    prior_file = sys.argv[2]
+    n_records = sys.argv[3]
+    annotators = sys.argv[4:]
+    serve(file, prior_file, n_records, annotators)
 
 if __name__ == "__main__":
     main()

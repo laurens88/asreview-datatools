@@ -17,7 +17,7 @@ def preprocess(file, output_file):
     dataframe.name = file
 
     dataframe = generalize_title_column(dataframe)
-    dataframe = generalize_title_column(dataframe)
+    dataframe = generalize_year_column(dataframe)
     dataframe = generalize_doi_column(dataframe)
     dataframe = prepare_label_column(dataframe)
     dataframe = clean_doi_column(dataframe)
