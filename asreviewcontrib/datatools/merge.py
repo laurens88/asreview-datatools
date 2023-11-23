@@ -11,6 +11,7 @@ from asreview.data.base import load_data
 
 import seaborn as sns
 import matplotlib.pyplot as plt
+import re
 
 pd.options.mode.chained_assignment = None
 
@@ -42,7 +43,6 @@ def merge(output_file, input_files):
     for df_i in range(len(list_dfs)):
         list_dfs[df_i].rename(columns=reverse_dict, inplace=True)
 
-        
         for included_column in config.COLUMN_DEFINITIONS['included']:
             if included_column in list_dfs[df_i].columns:
                 #Remove -1 labels
@@ -61,7 +61,7 @@ def merge(output_file, input_files):
 
     df_vstacked = pd.concat(list_dfs).reset_index(drop=True)
 
-    source_columns = input_files + [c for c in df_vstacked if ".csv" in c]
+    source_columns = input_files + [c for c in df_vstacked if ".csv" in c and not "included" in c]
     if output_file in source_columns:
         source_columns.remove(output_file)
 
@@ -82,7 +82,6 @@ def merge(output_file, input_files):
     #Output missing abstracts file
     if not df_missing_abstracts.empty:
         as_missing_abstracts = ASReviewData(df=df_missing_abstracts)
-        # as_missing_abstracts.to_file(output_file[:-4]+"_missing_AB.csv")
         as_missing_abstracts.df.to_csv(output_file[:-4]+"_missing_AB.csv", index=False)
 
     #Display statistics about datasets merged
@@ -161,8 +160,8 @@ def heatmap(dataframe):
     matrix = df_freq.values
 
     # Create a heatmap
-    sns.heatmap(matrix, cmap='viridis')
-    plt.show()    
+    # sns.heatmap(matrix, cmap='viridis')
+    # plt.show()    
 
 def duplicated(asrdata, pid='doi'):
         """Return boolean Series denoting duplicate rows.
@@ -184,6 +183,7 @@ def duplicated(asrdata, pid='doi'):
             # in case of strings, strip whitespaces and replace empty strings with None
             if is_string_dtype(asrdata.df[pid]):
                 s_pid = asrdata.df[pid].str.strip().replace("", None)
+                s_pid = re.sub(r'^https?:\/\/(www\.)?doi\.org\/', "", s_pid)
             else:
                 s_pid = asrdata.df[pid]
 
@@ -251,10 +251,11 @@ def drop_duplicates(asrdata, pid='doi', inplace=False, reset_index=True):
 
         for dupe in range(len(dupes.index)):
 
-            doi = original_doi[row]
+            doi = str(original_doi[row])
             title = original_titles[row]
 
-            dupe_doi = dupes_doi[dupe]
+            dupe_doi = str(dupes_doi[dupe])
+
             dupe_title = dupes_titles[dupe]
 
             #check if duplicate matches with doi if it is not empty, else do the same check with title

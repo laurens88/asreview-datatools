@@ -19,7 +19,7 @@ def serve(file, n_records, annotators):
 
     dataframe = pd.read_csv(file)
 
-    label_columns = [col for col in dataframe.columns if 'final_label_' in col]
+    label_columns = [col for col in dataframe.columns if 'final_label_' in col or 'included' in col]
 
     if label_columns:
 
