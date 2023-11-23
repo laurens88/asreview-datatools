@@ -31,28 +31,11 @@ def _check_suffix(input_files, output_file):
                 "type. "
             )
 
-
 def merge(output_file, input_files):
     _check_suffix(input_files, output_file)
     list_dfs = [load_data(item).df for item in input_files]
 
     file_dict = dict(zip(input_files, list_dfs))
-
-    title_mapping = {'title': config.COLUMN_DEFINITIONS['title']}
-    reverse_dict = {item: key for key, value_list in title_mapping.items() for item in value_list}
-    for df_i in range(len(list_dfs)):
-        list_dfs[df_i].rename(columns=reverse_dict, inplace=True)
-
-        for included_column in config.COLUMN_DEFINITIONS['included']:
-            if included_column in list_dfs[df_i].columns:
-                #Remove -1 labels
-                list_dfs[df_i][included_column] = list_dfs[df_i][included_column].replace(-1, None)
-                #rename included column to include file name
-                list_dfs[df_i].rename(columns={included_column: 'included_'+input_files[df_i]}, inplace=True)
-        #Generalize year columns to 'year'
-        for col in list_dfs[df_i].columns:
-            if 'year' in col:
-                list_dfs[df_i].rename(columns={col: 'year'}, inplace=True)
 
     #fill source column of individual file dataframes
     for df_i in range(len(list_dfs)):
@@ -75,7 +58,6 @@ def merge(output_file, input_files):
     merged_complete_records = df
     as_merged = ASReviewData(df=merged_complete_records)
     as_merged.df.to_csv(output_file, index=False)
-    # as_merged.to_file(output_file)
 
     df_missing_abstracts = df[df['abstract'] == ""]
 
@@ -154,7 +136,7 @@ def heatmap(dataframe):
     df_freq = df_freq.join(df_freq['row_as_str'].apply(lambda x: pd.Series(list(x))))
     df_freq = df_freq.drop(columns=['row_as_str'])
 
-    print(df_freq)
+    # print(df_freq)
 
     # Convert the DataFrame to a matrix
     matrix = df_freq.values
